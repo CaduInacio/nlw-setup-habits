@@ -1,4 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { View, Text, ScrollView, Alert } from "react-native";
 import { DAY_SIZE, HabitDay } from "../components/HabitDay";
@@ -17,14 +18,22 @@ const weekDays =
     'S',
     'S'
 ]
+
 const datesFromYearStart = generateDatesFromYearBeginning();
 const minimumSummaryDatesSize = 18 * 5;
 const amountOfDaysToFill = minimumSummaryDatesSize - datesFromYearStart.length;
 
+type SummaryProps = Array<{
+    id: string;
+    date: string;
+    amount: number;
+    completed: number;
+}>
+
 export function Home()
 {
     const [loading, setLoading] = useState(true);
-    const [summary, setSummary] = useState(null);
+    const [summary, setSummary] = useState<SummaryProps | null>(null);
 
     const { navigate } = useNavigation();
 
@@ -84,30 +93,43 @@ export function Home()
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ paddingBottom: 100}}
             >
+            {
+                summary &&
                 <View className="flex-row flex-wrap">
+                {
+                    datesFromYearStart.map(date =>
                     {
-                        datesFromYearStart.map(date =>
-                        (
+                        const dayWithHabits = summary.find(day => 
+                        {
+                            return dayjs(date).isSame(day.date)
+                        })
+
+                        return (
                             <HabitDay 
                                 key={date.toISOString()}
+                                date={date}
+                                amountOfHabits={dayWithHabits?.amount}
+                                amountCompleted={dayWithHabits?.completed}
                                 onPress={() => navigate('habit', { date:  date.toISOString()})}
                             />
-                        ))
-                    }
+                        )
+                    })
+                }
 
-                    {
-                        amountOfDaysToFill >0 && Array
-                        .from({ length: amountOfDaysToFill })
-                        .map((_, idx) =>
-                        (
-                            <View
-                                key={idx}
-                                className="bg-zinc-900 rounded-lg border-2 m-1 border-zinc-800 opacity-40"
-                                style={{ width: DAY_SIZE, height: DAY_SIZE}}
-                            />
-                        ))
-                    }
+                {
+                    amountOfDaysToFill >0 && Array
+                    .from({ length: amountOfDaysToFill })
+                    .map((_, idx) =>
+                    (
+                        <View
+                            key={idx}
+                            className="bg-zinc-900 rounded-lg border-2 m-1 border-zinc-800 opacity-40"
+                            style={{ width: DAY_SIZE, height: DAY_SIZE}}
+                        />
+                    ))
+                }
                 </View>
+            }
             </ScrollView>
         </View>
     )
