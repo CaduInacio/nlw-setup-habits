@@ -16,7 +16,7 @@ export function ProgressBar(props: ProgressBarProps)
                 aria-label="Progresso de hábitos completados nesse dia"
                 aria-aria-valuenow={props.progress}
                 aria-value-max={100}
-                className='h-3 rounded-xl bg-violet-600'
+                className='h-3 rounded-xl bg-violet-600 transition-all'
                 style={progressStyles}
             />
         </div>
